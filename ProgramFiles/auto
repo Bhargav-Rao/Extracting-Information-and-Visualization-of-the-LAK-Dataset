@@ -1,0 +1,70 @@
+echo 'Backgroud data preparation'
+python -c "import sys; lines = sys.stdin.readlines(); print ''.join(sorted(set(lines)))" < LAK-DATASET-DUMP.nt > LAK-DATASET-DUMP.ntrips
+python3 -c "import sys; lines = sys.stdin.readlines(); [print (i.replace('\t',' ')[:-1]) for i in lines]" < LAK-DATASET-DUMP.ntrips > LAK-DATASET-DUMP.ntriples
+rm LAK-DATASET-DUMP.ntrips
+echo 'Removed redundancy (31164)'
+wc -l LAK-DATASET-DUMP.ntriples
+grep 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' LAK-DATASET-DUMP.ntriples > Types.nt 
+echo 'Created Types.nt (5096)'
+wc -l Types.nt
+grep 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' LAK-DATASET-DUMP.ntriples -v > Rest.nt 
+echo 'Created Rest.nt (26068)'
+wc -l Rest.nt
+grep '> \"' Rest.nt > Nodes.nt
+echo 'Created Nodes.nt (12375)'
+wc -l Nodes.nt
+grep '> \"' Rest.nt -v > Relat.nt 
+echo 'Created Rest.nt (13693)'
+wc -l Relat.nt
+grep 'http://purl.org/dc/terms/subject' Relat.nt > subject.nt
+echo 'Created subject.nt (151)'
+wc -l subject.nt
+grep 'http://xmlns.com/foaf/0.1/based_near' Relat.nt > based.nt 
+echo 'Created based.nt (857)'
+wc -l based.nt
+grep 'http://xmlns.com/foaf/0.1/homepage' Relat.nt > homepg.nt 
+echo 'Created homepg.nt (10)'
+wc -l homepg.nt
+echo 'Running scripts'
+python auto1.py
+echo 'Created Nodes'
+python auto2.py
+echo 'Converted relationships'
+python auto3.py
+python auto4.py
+python auto5.py
+python auto6.py
+python auto7.py
+echo 'Converted everything to cypher text'
+python auto8.py
+python autoC.py
+echo 'Final cypher file ready (19443)'
+wc -l LAK-DATASET-DUMP.cyp
+echo 'Deleting intermediate files'
+rm LAK-DATASET-DUMP.ntriples
+rm Types.nt
+rm homepg.nt
+rm subject.nt
+rm Rest.nt
+rm Relat.nt
+rm based.nt
+rm Nodes.nt
+rm Types.cyp
+ls -l LAK-DATASET-DUMP.cyp
+python autoA.py
+echo 'Modularising Relationships'
+mv LAK-DATASET-DUMP.c LAK-DATASET-DUMP.cyp
+grep ']->(' LAK-DATASET-DUMP.cyp > Relations.cyp
+grep ']->(' LAK-DATASET-DUMP.cyp -v> Nodes.cyp 
+mkdir batches
+mkdir load
+cp ./Nodes.cyp ./load/Nodes.cyp
+python auto9.py
+echo 'Final Step'
+python autoB.py
+rm Relations.cyp
+rm Nodes.cyp
+rm batches/*
+rmdir batches
+mv R*.cyp ./load
+echo 'All Completed - All files to be loaded moved to ./load'
