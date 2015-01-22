@@ -1,0 +1,41 @@
+
+while getopts ":g :c" opt ; do
+  case $opt in
+  g)
+        echo 'Started'
+        
+        python3 clientcodeGUI.py
+        shift $((OPTIND - 1))
+		python getQuery.py
+		echo 'Running Query'
+		cat Intermediate2
+		echo ''
+		echo 'Parsing CSV'
+		echo 'Parsing CSV over'
+		python readCSV.py
+		python3 outputTable.py
+		
+      ;;
+  c)
+		python3 clientcode.py
+		shift $((OPTIND - 1))
+		python getQuery.py
+		echo 'Running Query'
+		cat Intermediate2
+		echo ''
+		echo 'Parsing CSV'
+		echo 'Parsing CSV over'
+		python readCSV.py
+		python3 outputTable.py
+      ;;
+  
+  \?)
+        echo 'Usage'
+        echo '     -g : Open GUI'
+        echo '     -c : Open CLI'
+  esac
+done
+rm Intermediate*
+
+
+
