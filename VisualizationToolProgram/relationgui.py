@@ -68,7 +68,7 @@ def set_query():
         query += "RETURN a"
     else:
         query += "RETURN b"
-    if z != 0:
+    if z != '0':
         query += " LIMIT {}".format (z)
     #print (query)
     fp = open("Intermediate2",'w')
